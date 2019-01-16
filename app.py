@@ -1,8 +1,9 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask import abort
+from flask_bootstrap import Bootstrap
 
 app = Flask(__name__)
-
+bootstrap = Bootstrap(app)
 
 @app.route('/')
 def index():
@@ -14,7 +15,7 @@ def user(name):
     if name == "":
         abort(404)
     else:
-        return '<h1>Hello, %s!</h1>' % name
+        return render_template('user.html', name=name)
 
 
 if __name__ == '__main__':
