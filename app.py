@@ -9,13 +9,14 @@ bootstrap = Bootstrap(app)
 def index():
     return '<h1>Hello World!</h1>'
 
+comments = ['xixi','haha','lala','kuku']
 
 @app.route('/user/<name>')
 def user(name):
     if name == "":
         abort(404)
     else:
-        return render_template('user.html', name=name)
+        return render_template('user.html', name=name, comments = comments)
 
 
 if __name__ == '__main__':
