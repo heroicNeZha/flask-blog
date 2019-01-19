@@ -1,13 +1,23 @@
 {% extends "bootstrap/base.html" %}
+
 {% block styles %}
     {{ super() }}
     <link type="text/css" rel="stylesheet" href={{ url_for('static', filename='css/site.css') }}/>
 {% endblock %}
+
 {% block title %}
     Flasky-blog
 {% endblock %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+{% endblock %}
+
 {% block navbar %}
-    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+{#    navbar-fix-top会导致导航条比界面高，遮挡界面内容    #}
+    <div class="navbar navbar-inverse" role="navigation">
         <div class="container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -43,11 +53,18 @@
 {% block content %}
     {{ super() }}
     <div class="container body-content">
-        {% block page_content %}
-        {% endblock %}
-    <footer class="page-footer">
-        <p>&copy;{{ moment().format('LL') }}  - flask-blog 由 flask 提供技术支持</p>
-    </footer>
+        <!-- 渲染Flash消息 -->
+        {% for message in get_flashed_messages() %}
+            <div class="alert alert-warning">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        {% block page_content %}{% endblock %}
+        <footer class="page-footer">
+            <p>&copy;{{ moment().format('LL') }} - flask-blog 由 flask 提供技术支持</p>
+        </footer>
     </div>
 {% endblock %}
 
