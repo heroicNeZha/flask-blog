@@ -1,5 +1,6 @@
 import os
 from flask import Flask, render_template, session, redirect, url_for, flash
+from flask_script import Manager, Shell
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 from flask_wtf import FlaskForm
@@ -13,18 +14,19 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'hard to guess string'
 # 数据库配置
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
-app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 bootstrap = Bootstrap(app)
 moment = Moment(app)
 db = SQLAlchemy(app)
+manager = Manager(app)
 
 
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True)
-    users = db.relationship('User' , backref = 'role')
+    users = db.relationship('User', backref='role')
 
     def __repr__(self):
         return '<Role %r>' % self.name
@@ -34,10 +36,11 @@ class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True)
-    role_id = db.Column(db.Integer,db.ForeignKey('roles.id'))
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
 
     def __repr__(self):
         return '<User %r>' % self.name
+
 
 class NameForm(FlaskForm):
     name = StringField('你叫啥名?', validators=[DataRequired()])
@@ -53,14 +56,28 @@ def page_not_found(e):
 def internal_server_error(e):
     return render_template('500.html'), 500
 
+@app.shell_context_processor
+def make_shell_context():
+    return dict(db=db, User=User, Role=Role)
+
+
+# manager.add_command("shell", Shell(make_context=make_shell_context()))
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     form = NameForm()
     if form.validate_on_submit():
-        if session.get('name') is not None and session['name'] != form.name.data:
-            flash('你的名字改变啦！')
+        user = User.query.filter_by(name=form.name.data).first()
+        if user is None:
+            user = User(name=form.name.data)
+            db.session.add(user)
+            db.session.commit()
+            session['known'] = False
+        else:
+            session['known'] = True
         session['name'] = form.name.data
+        form.name.data = ''
         return redirect(url_for('user'))
     return render_template('index.html', form=form)
 
@@ -69,14 +86,6 @@ def index():
 def user():
     return render_template('user.html')
 
-
-if __name__ == '__main__':
-    app.run(debug=True)
-
 # 通过flask script启动
-# from flask_script import Manager
-#
-# manager = Manager(app)
-#
-# if __name__ == '__main__':
-#     manager.run()
+if __name__ == '__main__':
+    manager.run()
