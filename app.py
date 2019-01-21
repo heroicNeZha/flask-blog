@@ -7,6 +7,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate, MigrateCommand
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -20,6 +21,7 @@ bootstrap = Bootstrap(app)
 moment = Moment(app)
 db = SQLAlchemy(app)
 manager = Manager(app)
+migrate = Migrate(app)
 
 
 class Role(db.Model):
@@ -56,12 +58,10 @@ def page_not_found(e):
 def internal_server_error(e):
     return render_template('500.html'), 500
 
+
 @app.shell_context_processor
 def make_shell_context():
     return dict(db=db, User=User, Role=Role)
-
-
-# manager.add_command("shell", Shell(make_context=make_shell_context()))
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -85,6 +85,10 @@ def index():
 @app.route('/user')
 def user():
     return render_template('user.html')
+
+
+manager.add_command("shell", Shell(make_context=make_shell_context))
+manager.add_command('db', MigrateCommand)
 
 # 通过flask script启动
 if __name__ == '__main__':
