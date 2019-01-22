@@ -21,7 +21,6 @@ bootstrap = Bootstrap(app)
 moment = Moment(app)
 db = SQLAlchemy(app)
 manager = Manager(app)
-migrate = Migrate(app)
 
 
 class Role(db.Model):
@@ -87,8 +86,10 @@ def user():
     return render_template('user.html')
 
 
-manager.add_command("shell", Shell(make_context=make_shell_context))
+migrate = Migrate(app, db)
 manager.add_command('db', MigrateCommand)
+
+manager.add_command("shell", Shell(make_context=make_shell_context))
 
 # 通过flask script启动
 if __name__ == '__main__':
