@@ -41,7 +41,7 @@
                 {% else %}
                     <ul class="nav navbar-nav navbar-right">
                         <li><a href="/">注册</a></li>
-                        <li><a href="{{ url_for('user' ,page=2,name= 2,_external = True) }}">登录</a></li>
+                        <li><a href="{{ url_for('.user' ,page=2,name= 2,_external = True) }}">登录</a></li>
                     </ul>
                 {% endif %}
 
