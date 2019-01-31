@@ -16,7 +16,7 @@
 {% endblock %}
 
 {% block navbar %}
-{#    navbar-fix-top会导致导航条比界面高，遮挡界面内容    #}
+    {#    navbar-fix-top会导致导航条比界面高，遮挡界面内容    #}
     <div class="navbar navbar-inverse" role="navigation">
         <div class="container">
             <div class="navbar-header">
@@ -31,20 +31,14 @@
                 <ul class="nav navbar-nav">
                     <li><a href="/">主页</a></li>
                 </ul>
-                {% if session['name'] %}
-                    <ul class="nav navbar-nav navbar-right">
-                        <li><a href="/" title="Manage your account">Hello,{{ session['name'] }}!</a></li>
-                        <li>
-                            <a href="/">注销</a>
-                        </li>
-                    </ul>
-                {% else %}
-                    <ul class="nav navbar-nav navbar-right">
-                        <li><a href="/">注册</a></li>
-                        <li><a href="{{ url_for('.user' ,page=2,name= 2,_external = True) }}">登录</a></li>
-                    </ul>
-                {% endif %}
-
+                <ul class="nav navbar-nav navbar-right">
+                    {% if current_user.is_authenticated %}
+                        <li><a href="{{ url_for('main.index') }}" title="Manage your account">Hello,{{ current_user.name }}!</a></li>
+                        <li><a href="{{ url_for('auth.logout') }}">注销</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('auth.login') }}">登录</a></li>
+                    {% endif %}
+                </ul>
             </div>
         </div>
     </div>
