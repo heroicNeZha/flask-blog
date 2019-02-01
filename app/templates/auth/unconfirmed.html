@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block page_content %}
+    <div class="page-header">
+        Hello,{{ current_user.name }}!
+    </div>
+    <div class="row">
+        <h3>您需要先确定你的账户。</h3>
+        <p>在您浏览网站之前需要先确认邮箱，检查你的邮箱，你将会收到一封带有确认链接的邮件。</p>
+        <p>如果没收到，请点击<a href="{{ url_for("auth.resend_confirmation") }}">这里</a>。</p>
+    </div>
+{% endblock %}

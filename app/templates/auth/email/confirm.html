@@ -1,0 +1,7 @@
+<p>{{ user.name }}，你好：</p>
+<p>    欢迎来到Flasky！</p>
+<p>    请点击下面的链接来确认你的账户</p>
+<p>    {{ url_for('auth.confirm', token = token, _external = True) }}</p>
+<p>                                    此致</p>
+<p>                                    Flasky团队</p>
+<p><small>    注:系统邮件不要回复</small></p>
