@@ -36,7 +36,7 @@ def register():
                     password=form.password.data)
         db.session.add(user)
         db.session.commit()
-        token = user.generate_conformation_token()
+        token = user.generate_confirmation_token()
         send_email(user.email, '确认账户',
                    'auth/email/confirm', user=user, token=token)
         flash('确认邮件已经发送到你的邮箱中！')
@@ -75,7 +75,7 @@ def unconfirmed():
 @auth.route('/confirm')
 @login_required
 def resend_confirmation():
-    token = current_user.generate_conformation_token()
+    token = current_user.generate_confirmation_token()
     send_email(current_user.email, '确认账户',
                'auth/email/confirm', user=current_user, token=token)
     flash('新的确认邮件已经发送到你的邮箱中！')

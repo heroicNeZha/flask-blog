@@ -32,7 +32,7 @@ class Role(db.Model):
         }
         for r in roles:
             role = Role.query.filter_by(name=r).first()
-            if r is None:
+            if role is None:
                 role = Role(name=r)
             role.permissions = roles[r][0]
             role.default = roles[r][1]
@@ -61,7 +61,7 @@ class User(db.Model, UserMixin):
     def password(self, password):
         self.password_hash = generate_password_hash(password)
 
-    def generate_conformation_token(self, expiration=3600):
+    def generate_confirmation_token(self, expiration=3600):
         s = Serializer(current_app.config['SECRET_KEY'], expiration)
         return s.dumps({'confirm': self.id})
 
