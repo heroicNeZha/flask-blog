@@ -1,3 +1,4 @@
+from datetime import datetime
 from . import db, login_manager
 from flask import current_app
 from flask_login import UserMixin, AnonymousUserMixin
@@ -12,10 +13,10 @@ def load_user(user_id):
 
 class Role(db.Model):
     __tablename__ = 'roles'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, unique=True)
-    default = db.Column(db.Boolean, default=False, index=True)
-    permissions = db.Column(db.Integer)
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(), unique=True)
+    default = db.Column(db.Boolean(), default=False, index=True)
+    permissions = db.Column(db.Integer())
     users = db.relationship('User', backref='role', lazy='dynamic')
 
     @staticmethod
@@ -45,12 +46,17 @@ class Role(db.Model):
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String, unique=True, index=True)
-    name = db.Column(db.String, unique=True, index=True)
-    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
-    password_hash = db.Column(db.String)
-    confirmed = db.Column(db.Boolean, default=False)
+    id = db.Column(db.Integer(), primary_key=True)
+    email = db.Column(db.String(), unique=True, index=True)
+    username = db.Column(db.String(), unique=True, index=True)
+    name = db.Column(db.String())
+    location = db.Column(db.String())
+    about_me = db.Column(db.Text())
+    member_since = db.Column(db.DateTime(), default=datetime.utcnow)
+    last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
+    role_id = db.Column(db.Integer(), db.ForeignKey('roles.id'))
+    password_hash = db.Column(db.String())
+    confirmed = db.Column(db.Boolean(), default=False)
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -59,6 +65,12 @@ class User(db.Model, UserMixin):
                 self.role = Role.query.filter_by(permissions=0xff).first()
             if self.role is None:
                 self.role = Role.query.filter_by(default=True).first()
+
+    #更新时间
+    def ping(self):
+        self.last_seen=datetime.utcnow()
+        db.session.add(self)
+        db.session.commit()
 
     # 权限认证
     def can(self, permissions):
@@ -108,7 +120,9 @@ class AnonymousUser(AnonymousUserMixin):
     def is_administrator(self):
         return False
 
+
 login_manager.anonymous_user = AnonymousUser
+
 
 class Permission:
     FOLLOW = 0x01

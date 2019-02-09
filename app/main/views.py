@@ -1,13 +1,21 @@
-from flask import render_template, session, redirect, url_for, current_app
+from flask import render_template, session, redirect, url_for, current_app, abort
 from . import main
 from ..decorators import admin_required, permission_required
 from flask_login import login_required
-from ..models import Permission
+from ..models import Permission, User
 
 
 @main.route('/', methods=['GET', 'POST'])
 def index():
     return render_template('index.html')
+
+
+@main.route('/user/<username>')
+def user(username):
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        abort(404)
+    return render_template('user.html', user=user)
 
 
 @main.route('/admin')
