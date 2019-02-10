@@ -1,8 +1,10 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
-from wtforms.validators import DataRequired
+from wtforms import StringField, SubmitField, TextAreaField
+from wtforms.validators import DataRequired, Length
 
 
-class NameForm(FlaskForm):
-    name = StringField('你叫啥名?', validators=[DataRequired()])
+class EditProfileForm(FlaskForm):
+    name = StringField('姓名', validators=[Length(0, 64)])
+    location = StringField('所在地', validators=[Length(0, 64)])
+    about_me = TextAreaField('自我介绍')
     submit = SubmitField('提交')
