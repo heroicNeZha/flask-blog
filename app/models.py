@@ -1,9 +1,10 @@
 from datetime import datetime
 from . import db, login_manager
-from flask import current_app
+from flask import current_app, request
 from flask_login import UserMixin, AnonymousUserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+import hashlib
 
 
 @login_manager.user_loader
@@ -66,9 +67,9 @@ class User(db.Model, UserMixin):
             if self.role is None:
                 self.role = Role.query.filter_by(default=True).first()
 
-    #更新时间
+    # 更新时间
     def ping(self):
-        self.last_seen=datetime.utcnow()
+        self.last_seen = datetime.utcnow()
         db.session.add(self)
         db.session.commit()
 
@@ -91,6 +92,16 @@ class User(db.Model, UserMixin):
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    # 头像生成
+    def gravatar(self, size=100, default='identicon', rating='g'):
+        if request.is_secure:
+            url = 'https://secure.gravatar.com/avatar'
+        else:
+            url = 'http://secure.gravatar.com/avatar'
+        hash = hashlib.md5(self.email.encode('utf-8')).hexdigest()
+        return '{url}/{hash}?s={size}&d={default}&r={rating}'.format(
+            url=url, hash=hash, size=size, default=default, rating=rating)
+
     # 令牌验证
     def generate_confirmation_token(self, expiration=3600):
         s = Serializer(current_app.config['SECRET_KEY'], expiration)
@@ -110,7 +121,7 @@ class User(db.Model, UserMixin):
         return True
 
     def __repr__(self):
-        return '<User %r>' % self.name
+        return '<User %r>' % self.username
 
 
 class AnonymousUser(AnonymousUserMixin):
