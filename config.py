@@ -12,6 +12,7 @@ class Config:
     FLASKY_MAIL_SUBJECT_PREFIX = '[FlaskBlog]'
     FLASKY_MAIL_SENDER = 'Flask Blog Admin <li495469217@163.com>'
     FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
+    FLASKY_POSTS_PER_PAGE = 10
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     # 需要在环境变量中设置邮箱名、密码、flasky_admin三个变量
     # cmd中用set，powershell用env：，我选择用pycharm-run-edit configuration-环境变量设置

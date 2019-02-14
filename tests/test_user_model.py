@@ -1,7 +1,7 @@
 from unittest import TestCase
 import time
 from app import create_app, db
-from app.models import User, Role
+from app.models import User, Role, Post
 from app.models import Permission, AnonymousUser
 
 
@@ -73,3 +73,7 @@ class UserModelTest(TestCase):
     def test_anonymous_user(self):
         u = AnonymousUser()
         self.assertFalse(u.can(Permission.WRITE_ARTICLES))
+
+    def test_generate_fake(self):
+        User.generate_fake(10)
+        Post.generate_fake(10)
